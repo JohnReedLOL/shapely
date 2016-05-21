@@ -75,13 +75,13 @@ object HListTest {
     val xs = 1 :: false :: HNil
 
 
-    object doubleFlip extends Poly {
-      implicit val i = at[Int] { _ * 2 } // this implicit is used for map
-      implicit val b = at[Boolean] { !_ }
+    object doubleFlip extends PolymorphicFunction {
+      implicit val i = at[Int].apply( (elem:Int) => elem * 2 ) // this implicit is used for map
+      implicit val b = at[Boolean].apply { (elem:Boolean) => !elem }
     }
 
-    object toString extends Poly {
-      implicit def default[A] = at[A] { _.toString }
+    object toString extends PolymorphicFunction {
+      implicit def default[A] = at[A].apply( (elem:A) => elem.toString )
     }
 
     /*

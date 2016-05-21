@@ -1,8 +1,10 @@
 package shapely
 
-trait Poly {
+trait PolymorphicFunction {
 
-  final def at[A] = new Caser[A]
+  final def at[A]: Caser[A] = {
+    new Caser[A]
+  }
 
   def apply[A, B](a: A)(implicit C: this.Case[A, B]): B = C(a)
 
