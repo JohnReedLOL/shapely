@@ -8,26 +8,26 @@ trait Remover[A, L <: HList] {
 
 private[shapely] trait RemoverLowPriorityImplicits {
 
-  implicit def base[A, L <: HList]: Remover.Aux[A, A :: L, L] = new Remover[A, A :: L] {
+  implicit def base[A, L <: HList]: Remover.Aux[A, A ::: L, L] = new Remover[A, A ::: L] {
     type Out = L
 
-    def apply(xs: A :: L) = xs.tail
+    def apply(xs: A ::: L) = xs.tail
   }
 }
 
 object Remover extends RemoverLowPriorityImplicits {
   type Aux[A, L <: HList, Out0 <: HList] = Remover[A, L] { type Out = Out0 }
 
-  implicit def corecurseRemove[A, L <: HList](implicit R: Remover[A, L]): Remover.Aux[A, A :: L, R.Out] = new Remover[A, A :: L] {
+  implicit def corecurseRemove[A, L <: HList](implicit R: Remover[A, L]): Remover.Aux[A, A ::: L, R.Out] = new Remover[A, A ::: L] {
     type Out = R.Out
 
-    def apply(xs: A :: L) = R(xs.tail)
+    def apply(xs: A ::: L) = R(xs.tail)
   }
 
-  implicit def corecurseRebuild[A, B, L <: HList](implicit R: Remover[A, L]): Remover.Aux[A, B :: L, B :: R.Out] = new Remover[A, B :: L] {
-    type Out = B :: R.Out
+  implicit def corecurseRebuild[A, B, L <: HList](implicit R: Remover[A, L]): Remover.Aux[A, B ::: L, B ::: R.Out] = new Remover[A, B ::: L] {
+    type Out = B ::: R.Out
 
-    def apply(xs: B :: L) = xs.head :: R(xs.tail)
+    def apply(xs: B ::: L) = xs.head :: R(xs.tail)
   }
 }
 
@@ -46,10 +46,10 @@ object Mapper {
     def apply(xs: HNil) = xs
   }
 
-  implicit def corecurse[A, B, L <: HList, P <: Poly](implicit C: P#Case[A, B], M: Mapper[L, P]): Mapper.Aux[A :: L, P, B :: M.Out] = new Mapper[A :: L, P] {
-    type Out = B :: M.Out
+  implicit def corecurse[A, B, L <: HList, P <: Poly](implicit C: P#Case[A, B], M: Mapper[L, P]): Mapper.Aux[A ::: L, P, B ::: M.Out] = new Mapper[A ::: L, P] {
+    type Out = B ::: M.Out
 
-    def apply(xs: A :: L) = C(xs.head) :: M(xs.tail)
+    def apply(xs: A ::: L) = C(xs.head) :: M(xs.tail)
   }
 }
 
@@ -62,16 +62,16 @@ trait Nther[L <: HList, N <: Nat] {
 object Nther {
   type Aux[L <: HList, N <: Nat, Out0] = Nther[L, N] { type Out = Out0 }
 
-  implicit def base[A, L <: HList]: Nther.Aux[A :: L, Zero, A] = new Nther[A :: L, Zero] {
+  implicit def base[A, L <: HList]: Nther.Aux[A ::: L, Zero, A] = new Nther[A ::: L, Zero] {
     type Out = A
 
-    def apply(xs: A :: L) = xs.head
+    def apply(xs: A ::: L) = xs.head
   }
 
-  implicit def corecurse[A, L <: HList, N <: Nat](implicit N: Nther[L, N]): Nther.Aux[A :: L, Succ[N], N.Out] = new Nther[A :: L, Succ[N]] {
+  implicit def corecurse[A, L <: HList, N <: Nat](implicit N: Nther[L, N]): Nther.Aux[A ::: L, Succ[N], N.Out] = new Nther[A ::: L, Succ[N]] {
     type Out = N.Out
 
-    def apply(xs: A :: L) = N(xs.tail)
+    def apply(xs: A ::: L) = N(xs.tail)
   }
 }
 
