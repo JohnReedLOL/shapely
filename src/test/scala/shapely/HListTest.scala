@@ -85,6 +85,7 @@ object HListTest {
     }
 
     /*
+    "xs map doubleFlip" is equivalent to...
     shapely.this.`package`.HListSyntax[
       shapely.package.:::[
         Int,shapely.package.:::[
@@ -101,8 +102,7 @@ object HListTest {
           Boolean, Boolean, shapely.HNil.type, doubleFlip.type
         ](doubleFlip.b, shapely.this.Mapper.base[doubleFlip.type])
       )
-    )
-    */
+    )*/
     val xsFlip = xs map doubleFlip
 
     SDebug.traceExpression(xs map doubleFlip) // HCons(2,HCons(true,HNil0))
@@ -111,9 +111,10 @@ object HListTest {
   }
 
   {
-    val xs = 1 :: false :: HNil
+    val xs = 1 :: false :: true :: HNil
 
     /*
+    "xs.nth(0)" is equivalent to...
     "shapely.this.`package`.HListSyntax[
       shapely.package.:::[
         Int,shapely.package.:::[
@@ -125,12 +126,30 @@ object HListTest {
         Int, shapely.package.:::[
           Boolean,shapely.HNil.type
         ]
-      ]
-    */
+      ]*/
     xs.nth(0)
 
     SDebug.traceExpression(xs.nth(0)) // 1
 
-    xs.nth(1)
+    /*
+    "shapely.this.`package`.HListSyntax[
+      shapely.package.:::[
+        Int,shapely.package.:::[Boolean,shapely.HNil.type]
+      ]
+    ]
+    (xs).nth(  shapely.Succ.apply[shapely.Zero0.type]
+      (shapely.`package`.Zero)
+    )
+    ( shapely.this.Nther.corecurse[
+        Int, shapely.HCons[Boolean,shapely.HNil.type],
+        shapely.Zero0.type
+      ](shapely.this.Nther.base[
+        Boolean, shapely.HNil.type
+      ])
+    )
+     */
+    SDebug.traceExpression(xs.nth(1)) // false
+
+    SDebug.traceExpression(xs.nth(2))
   }
 }

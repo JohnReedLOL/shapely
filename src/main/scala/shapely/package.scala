@@ -7,6 +7,9 @@ package object shapely {
   type Zero = Zero0.type
   val Zero = Zero0
 
+  // type Zero1 = Zero1.type
+  // val Zero1 = Zero1 // recursive value Zero1 needs type
+
   implicit class HListSyntax[L <: HList](val self: L) extends AnyVal {
 
     def ::[H](head: H): H ::: L = HCons(head, self)

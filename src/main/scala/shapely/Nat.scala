@@ -24,7 +24,7 @@ class NatMacros(val c: whitebox.Context) {
       if (n <= 0) acc else loop(n - 1, q"shapely.Succ($acc)")
 
     i match {
-      case Literal(Constant(n: Int)) if n >= 0 =>
+      case Literal(Constant(n: Int)) if n >= 0 => // this is what generates our natural numbers for xs.nth(0)
         loop(n, q"shapely.Zero")
 
       case _ =>
