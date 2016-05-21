@@ -2,6 +2,8 @@ package shapely
 
 object PolyTest {
 
+  println("Running PolyTest")
+
   {
     object add extends Poly {
       implicit val i = at[Int] { _ + 1 }

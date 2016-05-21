@@ -2,6 +2,8 @@ package shapely
 
 object HListTest {
 
+  println("Running HListTest")
+
   {
     val xs = 1 :: false :: "hi" :: HNil
 

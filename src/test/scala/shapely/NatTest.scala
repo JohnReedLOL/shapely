@@ -2,6 +2,8 @@ package shapely
 
 object NatTest {
 
+  println("Running NatTest")
+
   {
     Nat.fromInt(2)
   }
