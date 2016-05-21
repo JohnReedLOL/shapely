@@ -1,6 +1,6 @@
 package shapely
 
-trait HList {
+sealed trait HList {
   type Append[L <: HList] <: HList
 
   def ++[L <: HList](xs: L): Append[L]

@@ -16,7 +16,7 @@ private[shapely] trait RemoverLowPriorityImplicits {
 }
 
 object Remover extends RemoverLowPriorityImplicits {
-  type Aux[A, L <: HList, Out0 <: HList] = Remover[A, L] { type Out = Out0 }
+  type Aux[A, L <: HList, Out0 <: HList] = Remover[A, L] {type Out = Out0}
 
   implicit def corecurseRemove[A, L <: HList](implicit R: Remover[A, L]): Remover.Aux[A, A ::: L, R.Out] = new Remover[A, A ::: L] {
     type Out = R.Out
@@ -38,7 +38,7 @@ trait Mapper[L <: HList, P <: Poly] {
 }
 
 object Mapper {
-  type Aux[L <: HList, P <: Poly, Out0 <: HList] = Mapper[L, P] { type Out = Out0 }
+  type Aux[L <: HList, P <: Poly, Out0 <: HList] = Mapper[L, P] {type Out = Out0}
 
   implicit def base[P <: Poly]: Mapper.Aux[HNil, P, HNil] = new Mapper[HNil, P] {
     type Out = HNil
@@ -60,7 +60,7 @@ trait Nther[L <: HList, N <: Nat] {
 }
 
 object Nther {
-  type Aux[L <: HList, N <: Nat, Out0] = Nther[L, N] { type Out = Out0 }
+  type Aux[L <: HList, N <: Nat, Out0] = Nther[L, N] {type Out = Out0}
 
   implicit def base[A, L <: HList]: Nther.Aux[A ::: L, Zero, A] = new Nther[A ::: L, Zero] {
     type Out = A

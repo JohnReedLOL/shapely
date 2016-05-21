@@ -74,8 +74,9 @@ object HListTest {
   {
     val xs = 1 :: false :: HNil
 
+
     object doubleFlip extends Poly {
-      implicit val i = at[Int] { _ * 2 }
+      implicit val i = at[Int] { _ * 2 } // this implicit is used for map
       implicit val b = at[Boolean] { !_ }
     }
 
@@ -83,9 +84,28 @@ object HListTest {
       implicit def default[A] = at[A] { _.toString }
     }
 
+    /*
+    shapely.this.`package`.HListSyntax[
+      shapely.package.:::[
+        Int,shapely.package.:::[
+          Boolean,shapely.HNil.type
+        ]
+      ]
+    ](xs).map[doubleFlip.type](doubleFlip)(
+      shapely.this.Mapper.corecurse[
+        Int, Int, shapely.package.:::[
+          Boolean,shapely.HNil.type
+        ], doubleFlip.type
+      ](
+        doubleFlip.i, shapely.this.Mapper.corecurse[
+          Boolean, Boolean, shapely.HNil.type, doubleFlip.type
+        ](doubleFlip.b, shapely.this.Mapper.base[doubleFlip.type])
+      )
+    )
+    */
     val xsFlip = xs map doubleFlip
 
-    SDebug.traceExpression(xs map doubleFlip)
+    SDebug.traceExpression(xs map doubleFlip) // HCons(2,HCons(true,HNil0))
 
     xs map toString head: String
   }
@@ -93,9 +113,23 @@ object HListTest {
   {
     val xs = 1 :: false :: HNil
 
+    /*
+    "shapely.this.`package`.HListSyntax[
+      shapely.package.:::[
+        Int,shapely.package.:::[
+          Boolean,shapely.HNil.type
+        ]
+      ]
+    ](xs).nth(shapely.`package`.Zero)(
+      shapely.this.Nther.base[
+        Int, shapely.package.:::[
+          Boolean,shapely.HNil.type
+        ]
+      ]
+    */
     xs.nth(0)
 
-    SDebug.traceExpression(xs.nth(0))
+    SDebug.traceExpression(xs.nth(0)) // 1
 
     xs.nth(1)
   }
