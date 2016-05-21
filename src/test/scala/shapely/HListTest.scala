@@ -76,12 +76,17 @@ object HListTest {
 
 
     object doubleFlip extends PolymorphicFunction {
-      implicit val i = at[Int].apply( (elem:Int) => elem * 2 ) // this implicit is used for map
-      implicit val b = at[Boolean].apply { (elem:Boolean) => !elem }
+      // this implicit is used for map
+      implicit val i: Case[Int,Int] = at[Int].apply( (elem:Int) => elem * 2 )
+
+      implicit val b = at[Boolean].apply( (elem) => !elem )
     }
 
     object toString extends PolymorphicFunction {
-      implicit def default[A] = at[A].apply( (elem:A) => elem.toString )
+      // Fallback if no implicit val is defined
+      implicit def default[A]: Case[A, String] = {
+        at[A].apply( (elem:A) => elem.toString )
+      }
     }
 
     /*
@@ -107,7 +112,7 @@ object HListTest {
 
     SDebug.traceExpression(xs map doubleFlip) // HCons(2,HCons(true,HNil0))
 
-    xs map toString head: String
+    val stringHead: String = (xs map toString).head
   }
 
   {
