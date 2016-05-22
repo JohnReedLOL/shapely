@@ -6,7 +6,7 @@ object HListTest {
   System.err.println("Running HListTest")
 
   {
-    val xs: shapely.:::[Int, shapely.:::[Boolean, shapely.:::[String, HNil0.type]]]
+    val xs: HCons[Int, HCons[Boolean, HCons[String, HNil0.type]]]
       = 1 :: false :: "hi" :: HNil
 
     // HCons(1,HCons(false,HCons(hi,HNil0)))"
@@ -18,13 +18,14 @@ object HListTest {
   }
 
   {
-    val xs: Int ::: Boolean ::: HNil = 1 :: false :: HNil
+    val xs : HCons[Int, HCons[Boolean, HNil0.type]]
+      = 1 :: false :: HNil // colons bind from the right first
 
     xs.tail.head: Boolean
   }
 
   {
-    val xsAppend: shapely.:::[Int, HNil0.type]#Append[shapely.:::[Boolean, HNil0.type]]
+    val xsAppend: HCons[Int, HNil0.type]#Append[HCons[Boolean, HNil0.type]]
       = (1 :: HNil) ++ (false :: HNil)
 
     // HCons(1,HCons(false,HNil0))
@@ -52,12 +53,11 @@ object HListTest {
       shapely.this.Remover.base[
         Int, shapely.package.:::[Boolean,shapely.HNil.type]
       ]
-    )
-     */
-    // implicit remover of type Remover[Int, Boolean ::: HNil.type]
+    )*/
+    // These are identical
     SDebug.traceExpression(xs.remove[Int]) // HCons(false,HNil0)"
-
-    val equivalent = xs.remove[Int](shapely.Remover.base[Int, Boolean ::: shapely.HNil.type ])
+    val equivalent = HListSyntax[HCons[Int, HCons[Boolean, HNil.type]]](xs).remove[Int](Remover.base[Int, HCons[Boolean, HNil.type]])
+    SDebug.traceExpression(HListSyntax[HCons[Int, HCons[Boolean, HNil.type]]](xs).remove[Int](Remover.base[Int, HCons[Boolean, HNil.type]]))
 
     /*
     "shapely.this.`package`.HListSyntax[

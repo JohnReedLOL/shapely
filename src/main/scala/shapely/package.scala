@@ -1,15 +1,14 @@
 package object shapely {
-  type :::[H, T <: HList] = HCons[H, T]
 
-  type HNil = HNil0.type
+  type HNilT = HNil0.type
   val HNil = HNil0
 
-  type Zero = Zero0.type
+  type ZeroT = Zero0.type
   val Zero = Zero0
 
   implicit class HListSyntax[L <: HList](val self: L) extends AnyVal {
 
-    def ::[H](head: H): H ::: L = HCons(head, self)
+    def ::[H](head: H): HCons[H, L] = HCons(head, self)
 
     def remove[A](implicit R: Remover[A, L]): R.Out = R(self)
 
@@ -24,6 +23,7 @@ package object shapely {
       * type of n (N <: Nat) from first parameter block to second.
       *
       * Replacing "n.N" with "n.type" causes "Error: could not find implicit value for parameter N"
+      *
       * @param N "Nther" is an implicit typeclass proof that indexing is valid.
       * "L" is the type of the HList (self) that is calling "nth".
       *  This expands into a series of calls to "Nther.corecurse" and "Nther.base" (for base/zero)

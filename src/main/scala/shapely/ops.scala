@@ -8,10 +8,10 @@ trait Remover[A, L <: HList] {
 
 private[shapely] trait RemoverLowPriorityImplicits {
 
-  implicit def base[A, L <: HList]: Remover.Aux[A, A ::: L, L] = new Remover[A, A ::: L] {
+  implicit def base[A, L <: HList]: Remover.Aux[A, HCons[A, L], L] = new Remover[A, HCons[A, L] ] {
     type Out = L
 
-    def apply(xs: A ::: L) = xs.tail
+    def apply(xs: HCons[A, L] ) = xs.tail
   }
 }
 
@@ -19,17 +19,17 @@ object Remover extends RemoverLowPriorityImplicits {
   type Aux[A, L <: HList, Out0 <: HList] = Remover[A, L] {type Out = Out0}
 
   implicit def corecurseRemove[A, L <: HList](implicit R: Remover[A, L])
-  : Remover.Aux[A, A ::: L, R.Out] = new Remover[A, A ::: L] {
+  : Remover.Aux[A, HCons[A, L], R.Out] = new Remover[A, HCons[A, L]] {
     type Out = R.Out
 
-    def apply(xs: A ::: L) = R(xs.tail)
+    def apply(xs: HCons[A, L]) = R(xs.tail)
   }
 
   implicit def corecurseRebuild[A, B, L <: HList](implicit R: Remover[A, L])
-  : Remover.Aux[A, B ::: L, B ::: R.Out] = new Remover[A, B ::: L] {
-    type Out = B ::: R.Out
+  : Remover.Aux[A, HCons[B, L], HCons[B, R.Out]] = new Remover[A, HCons[B, L] ] {
+    type Out = HCons[B, R.Out]
 
-    def apply(xs: B ::: L) = xs.head :: R(xs.tail)
+    def apply(xs: HCons[B, L] ) = xs.head :: R(xs.tail)
   }
 }
 
@@ -42,10 +42,10 @@ trait Mapper[L <: HList, P <: PolymorphicFunction] {
 object Mapper {
   type Aux[L <: HList, P <: PolymorphicFunction, Out0 <: HList] = Mapper[L, P] {type Out = Out0}
 
-  implicit def base[P <: PolymorphicFunction]: Mapper.Aux[HNil, P, HNil] = new Mapper[HNil, P] {
-    type Out = HNil
+  implicit def base[P <: PolymorphicFunction]: Mapper.Aux[HNilT, P, HNilT] = new Mapper[HNilT, P] {
+    type Out = HNilT
 
-    def apply(xs: HNil) = xs
+    def apply(xs: HNilT) = xs
   }
 
   /** @param C Case from A to B (compiler lookup)
@@ -58,10 +58,10 @@ object Mapper {
     */
   implicit def corecurse[A, B, L <: HList, P <: PolymorphicFunction]
   (implicit C: P#Case[A, B], M: Mapper[L, P])
-  : Mapper.Aux[A ::: L, P, B ::: M.Out] = new Mapper[A ::: L, P] {
-    type Out = B ::: M.Out
+  : Mapper.Aux[ HCons[A, L], P, HCons[B, M.Out] ] = new Mapper[ HCons[A, L], P] {
+    type Out = HCons[B, M.Out]
 
-    def apply(xs: A ::: L) = C(xs.head) :: M(xs.tail)
+    def apply(xs: HCons[A, L]) = C(xs.head) :: M(xs.tail)
   }
 }
 
@@ -74,18 +74,18 @@ trait Nther[L <: HList, N <: Nat] {
 object Nther {
   type Aux[L <: HList, N <: Nat, Out0] = Nther[L, N] {type Out = Out0}
 
-  implicit def base[A, L <: HList]: Nther.Aux[A ::: L, Zero, A] = new Nther[A ::: L, Zero] {
+  implicit def base[A, L <: HList]: Nther.Aux[HCons[A, L], ZeroT, A] = new Nther[HCons[A, L], ZeroT] {
     type Out = A
 
-    def apply(xs: A ::: L) = xs.head
+    def apply(xs: HCons[A, L]) = xs.head
   }
 
   implicit def corecurse[A, L <: HList, N <: Nat]
   (implicit N: Nther[L, N])
-  : Nther.Aux[A ::: L, Successor[N], N.Out] = new Nther[A ::: L, Successor[N]] {
+  : Nther.Aux[HCons[A, L], Successor[N], N.Out] = new Nther[HCons[A, L], Successor[N]] {
     type Out = N.Out
 
-    def apply(xs: A ::: L) = N(xs.tail)
+    def apply(xs: HCons[A, L]) = N(xs.tail)
   }
 }
 
@@ -95,11 +95,12 @@ trait ToInt[N <: Nat] {
 
 object ToInt {
 
-  implicit def base: ToInt[Zero] = new ToInt[Zero] {
+  implicit def base: ToInt[ZeroT] = new ToInt[ZeroT] {
     val value = 0
   }
 
   /** Gets the successor of N
+    *
     * @param N the value to get the successor of
     * @tparam N the type corresponding to that value
     * @return the value plus one (the type is wrapped in Successor[])
