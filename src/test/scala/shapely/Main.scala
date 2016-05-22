@@ -8,11 +8,11 @@ import scala.trace.SDebug
 object Main {
 
   trait TempTrait {
-    type IntT = Int
+    type IntT
   }
 
   class S extends TempTrait {
-
+    override type IntT = Int
   }
 
   def main(args: Array[String]) {
@@ -29,7 +29,7 @@ object Main {
     SDebug.traceExpression(fromInt) // Successor(Successor(shapely.Zero0$@7cbd213e))
     SDebug.traceExpression(fromIntCasted) // the cast works
 
-    val t: TempTrait#IntT = 5
+    val t: S#IntT = 5
     val t2: TempTrait = new S()
     val t3: t2.type = t2
     val v1 = HListTest

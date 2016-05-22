@@ -11,7 +11,7 @@ sealed trait HList {
 final case class HCons[H, T <: HList](head: H, tail: T) extends HList {
   // Context independent type level function. If tail is HNil0, HCons[ H, L ]
   // If Tail is HCons, recurse ex. HCons[ H1, HCons[ H2, L ] ]
-  override type Append[L <: HList] = HCons[ H,T#Append[L] ]
+  override type Append[L <: HList] = HCons[H, T#Append[L]]
   // "HCons[ H,T#Append[L] ]" == "H ::: T#Append[L]"
 
   override def ++[L <: HList](xs: L): HCons.this.Append[L] = {

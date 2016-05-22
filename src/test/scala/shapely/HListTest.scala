@@ -136,7 +136,7 @@ object HListTest {
       ]*/
     xs.nth(0)
 
-    shapely.Zero // same as object Zero0
+    SDebug.traceExpression(shapely.Zero) // same as object Zero0
 
     SDebug.traceExpression(xs.nth(0)) // 1
 
