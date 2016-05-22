@@ -1,16 +1,17 @@
 package shapely
+import scala.trace.SDebug
 
 object PolyTest {
 
-  println("Running PolyTest")
+  System.err.println("Running PolyTest")
 
   {
     object add extends PolymorphicFunction {
-      implicit val i: this.Case[Int, Int] = at[Int].apply( (elem:Int) => elem + 1 )
-      implicit val d = at[Double].apply( (elem:Double) => elem + 1.0 )
+      implicit val i: this.Case[Int, Int] = at[Int].apply( _+1 )
+      implicit val d = at[Double].apply( _+1.0 )
     }
 
-    add(42)
-    add(3.14)
+    SDebug.traceCode(add.apply(42)) // implicit param i
+    SDebug.traceCode(add.apply(3.14)(add.d))
   }
 }

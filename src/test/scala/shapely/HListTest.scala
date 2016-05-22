@@ -3,7 +3,7 @@ import scala.trace._
 
 object HListTest {
 
-  println("Running HListTest")
+  System.err.println("Running HListTest")
 
   {
     val xs: shapely.:::[Int, shapely.:::[Boolean, shapely.:::[String, HNil0.type]]]
@@ -31,6 +31,8 @@ object HListTest {
     SDebug.traceExpression((1 :: HNil) ++ (false :: HNil))
 
     val xsAppendTailHead = xsAppend.tail.head: Boolean
+
+    SDebug.traceCode(xsAppend.tail) // (xsAppend.tail) -> HCons(false,HNil0)
 
     SDebug.traceCode(xsAppendTailHead) // false
   }
@@ -134,6 +136,8 @@ object HListTest {
       ]*/
     xs.nth(0)
 
+    shapely.Zero // same as object Zero0
+
     SDebug.traceExpression(xs.nth(0)) // 1
 
     /*
@@ -152,7 +156,7 @@ object HListTest {
         Boolean, shapely.HNil.type
       ])
     )
-     */
+   */
     SDebug.traceExpression(xs.nth(1)) // false
 
     SDebug.traceExpression(xs.nth(2))

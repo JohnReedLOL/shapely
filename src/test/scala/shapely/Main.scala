@@ -1,5 +1,7 @@
 package shapely
 
+import scala.trace.SDebug
+
 /**
   * Created by johnreed on 5/21/16.
   */
@@ -14,6 +16,19 @@ object Main {
   }
 
   def main(args: Array[String]) {
+
+    val one: Successor[Zero0.type] = shapely.Successor(shapely.Zero)
+
+    val two: Int = Nat.toInt[Successor[Successor[Zero]]]
+    SDebug.traceCode(two) // 2
+
+    val fromInt: Nat = Nat.fromInt(2)
+    val fromIntCasted: Successor[Successor[shapely.Zero]] =
+      fromInt.asInstanceOf[Successor[Successor[Zero]]]
+
+    SDebug.traceExpression(fromInt) // Successor(Successor(shapely.Zero0$@7cbd213e))
+    SDebug.traceExpression(fromIntCasted) // the cast works
+
     val t: TempTrait#IntT = 5
     val t2: TempTrait = new S()
     val t3: t2.type = t2

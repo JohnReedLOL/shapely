@@ -18,13 +18,15 @@ private[shapely] trait RemoverLowPriorityImplicits {
 object Remover extends RemoverLowPriorityImplicits {
   type Aux[A, L <: HList, Out0 <: HList] = Remover[A, L] {type Out = Out0}
 
-  implicit def corecurseRemove[A, L <: HList](implicit R: Remover[A, L]): Remover.Aux[A, A ::: L, R.Out] = new Remover[A, A ::: L] {
+  implicit def corecurseRemove[A, L <: HList](implicit R: Remover[A, L])
+  : Remover.Aux[A, A ::: L, R.Out] = new Remover[A, A ::: L] {
     type Out = R.Out
 
     def apply(xs: A ::: L) = R(xs.tail)
   }
 
-  implicit def corecurseRebuild[A, B, L <: HList](implicit R: Remover[A, L]): Remover.Aux[A, B ::: L, B ::: R.Out] = new Remover[A, B ::: L] {
+  implicit def corecurseRebuild[A, B, L <: HList](implicit R: Remover[A, L])
+  : Remover.Aux[A, B ::: L, B ::: R.Out] = new Remover[A, B ::: L] {
     type Out = B ::: R.Out
 
     def apply(xs: B ::: L) = xs.head :: R(xs.tail)
@@ -46,7 +48,17 @@ object Mapper {
     def apply(xs: HNil) = xs
   }
 
-  implicit def corecurse[A, B, L <: HList, P <: PolymorphicFunction](implicit C: P#Case[A, B], M: Mapper[L, P]): Mapper.Aux[A ::: L, P, B ::: M.Out] = new Mapper[A ::: L, P] {
+  /** @param C Case from A to B (compiler lookup)
+    * @param M A mapper over L with P
+    * @tparam A Type at the head of the list
+    * @tparam B Output type
+    * @tparam L The type of the user's HList
+    * @tparam P User defines subclass of PolymorphicFunction
+    * @return
+    */
+  implicit def corecurse[A, B, L <: HList, P <: PolymorphicFunction]
+  (implicit C: P#Case[A, B], M: Mapper[L, P])
+  : Mapper.Aux[A ::: L, P, B ::: M.Out] = new Mapper[A ::: L, P] {
     type Out = B ::: M.Out
 
     def apply(xs: A ::: L) = C(xs.head) :: M(xs.tail)
@@ -68,7 +80,9 @@ object Nther {
     def apply(xs: A ::: L) = xs.head
   }
 
-  implicit def corecurse[A, L <: HList, N <: Nat](implicit N: Nther[L, N]): Nther.Aux[A ::: L, Succ[N], N.Out] = new Nther[A ::: L, Succ[N]] {
+  implicit def corecurse[A, L <: HList, N <: Nat]
+  (implicit N: Nther[L, N])
+  : Nther.Aux[A ::: L, Successor[N], N.Out] = new Nther[A ::: L, Successor[N]] {
     type Out = N.Out
 
     def apply(xs: A ::: L) = N(xs.tail)
@@ -85,7 +99,13 @@ object ToInt {
     val value = 0
   }
 
-  implicit def succ[N <: Nat](implicit N: ToInt[N]): ToInt[Succ[N]] = new ToInt[Succ[N]] {
+  /** Gets the successor of N
+    * @param N the value to get the successor of
+    * @tparam N the type corresponding to that value
+    * @return the value plus one (the type is wrapped in Successor[])
+    */
+  implicit def successor[N <: Nat](implicit N: ToInt[N])
+  : ToInt[Successor[N]] = new ToInt[Successor[N]] {
     val value = 1 + N.value
   }
 }

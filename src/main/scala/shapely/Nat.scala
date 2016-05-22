@@ -1,16 +1,22 @@
 package shapely
 
+import scala.annotation.tailrec
 import scala.language.experimental.macros
-
 import scala.reflect.macros.whitebox
 
 trait Nat {
-  type N <: Nat
+  type N <: Nat // this self type allows for implicit conversion with implicit N: Nther[L, n.N]
 }
 
 object Nat {
 
-  implicit def fromInt(i: Int): Nat = macro NatMacros.materialize
+  /** Converts a number like "1" into "Successor[Zero]", for dependent types in the compiler.
+    * @param int the int to convert into a Natural number in the form of (Successor(Successor(Zero)))
+    * @return the subtype of Nat representing how many successors away from zero we are.
+    * @note - the implicit modifier works on macros. At compile time, the compiler
+    * searches for ints like "1" and replaces them with "(Successor(Zero))"
+    */
+  implicit def fromInt(int: Int): Nat = macro NatMacros.materialize
 
   def toInt[N <: Nat](implicit N: ToInt[N]): Int = N.value
 }
@@ -19,13 +25,14 @@ object Nat {
 class NatMacros(val c: whitebox.Context) {
   import c.universe._
 
-  def materialize(i: Tree): Tree = {
-    def loop(n: Int, acc: Tree): Tree =
-      if (n <= 0) acc else loop(n - 1, q"shapely.Succ($acc)")
-
-    i match {
+  def materialize(int: c.Tree): c.Tree = {
+    @tailrec def nest(n: Int, accumulator: Tree): Tree = {
+      if (n <= 0) accumulator
+      else nest(n - 1, q"shapely.Successor($accumulator)") // recursively nest (Successor(Zero))
+    }
+    int match {
       case Literal(Constant(n: Int)) if n >= 0 => // this is what generates our natural numbers for xs.nth(0)
-        loop(n, q"shapely.Zero")
+        nest(n, q"shapely.Zero")
 
       case _ =>
         c.abort(c.enclosingPosition, s"not a natural number")
@@ -33,10 +40,12 @@ class NatMacros(val c: whitebox.Context) {
   }
 }
 
+// "shapely.Zero" is the same as this object
 object Zero0 extends Nat {
+  // I'm pretty sure these are used to pass the concrete type from () to () in a function definition.
   type N = Zero0.type
 }
 
-case class Succ[N0 <: Nat](n: N0) extends Nat {
-  type N = Succ[N0]
+case class Successor[N0 <: Nat](n: N0) extends Nat {
+  type N = Successor[N0]
 }
