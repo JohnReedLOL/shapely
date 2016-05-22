@@ -40,12 +40,11 @@ class NatMacros(val c: whitebox.Context) {
   }
 }
 
-// "shapely.Zero" is the same as this object
-object Zero0 extends Nat {
+object Zero extends Nat {
   // I'm pretty sure these are used to pass the concrete type from () to () in a function definition.
-  type N = Zero0.type
+  override type N = Zero.type
 }
 
 case class Successor[N0 <: Nat](n: N0) extends Nat {
-  type N = Successor[N0]
+  override type N = Successor[N0]
 }

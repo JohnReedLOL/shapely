@@ -6,7 +6,7 @@ object HListTest {
   System.err.println("Running HListTest")
 
   {
-    val xs: HCons[Int, HCons[Boolean, HCons[String, HNil0.type]]]
+    val xs: HCons[Int, HCons[Boolean, HCons[String, HNil.type]]]
       = 1 :: false :: "hi" :: HNil
 
     // HCons(1,HCons(false,HCons(hi,HNil0)))"
@@ -18,14 +18,14 @@ object HListTest {
   }
 
   {
-    val xs : HCons[Int, HCons[Boolean, HNil0.type]]
+    val xs : HCons[Int, HCons[Boolean, HNil.type]]
       = 1 :: false :: HNil // colons bind from the right first
 
     xs.tail.head: Boolean
   }
 
   {
-    val xsAppend: HCons[Int, HNil0.type]#Append[HCons[Boolean, HNil0.type]]
+    val xsAppend: HCons[Int, HNil.type]#Append[HCons[Boolean, HNil.type]]
       = (1 :: HNil) ++ (false :: HNil)
 
     // HCons(1,HCons(false,HNil0))
@@ -39,7 +39,11 @@ object HListTest {
   }
 
   {
-    val xs = 1 :: false :: HNil
+    type headT = Int
+    type tailT = HCons[Boolean, HNil.type]
+    type xsT = HCons[headT, tailT]
+    val xs: xsT
+      = 1 :: false :: HNil
 
     val xsNoInt = xs.remove[Int].head: Boolean
 
@@ -56,7 +60,8 @@ object HListTest {
     )*/
     // These are identical
     SDebug.traceExpression(xs.remove[Int]) // HCons(false,HNil0)"
-    val equivalent = HListSyntax[HCons[Int, HCons[Boolean, HNil.type]]](xs).remove[Int](Remover.base[Int, HCons[Boolean, HNil.type]])
+    // L is the same type as xs.
+    val equivalent = HListSyntax[HCons[headT, tailT]](xs).remove[Int](Remover.base[headT, tailT])
     SDebug.traceExpression(HListSyntax[HCons[Int, HCons[Boolean, HNil.type]]](xs).remove[Int](Remover.base[Int, HCons[Boolean, HNil.type]]))
 
     /*
@@ -70,7 +75,19 @@ object HListTest {
       ](shapely.this.Remover.base[Boolean, shapely.HNil.type])
     ) -> HCons(1,HNil0)"*/
     val xsNoBoolean = xs.remove[Boolean].head: Int
-    SDebug.traceExpression(xs.remove[Boolean]) // HCons(1,HNil0)
+    /*
+    "shapely.this.`package`.HListSyntax[xsT](xs).remove[Boolean](
+      shapely.this.Remover.corecurseRebuild[Boolean, headT, tailT](
+        shapely.this.Remover.base[Boolean, shapely.HNil.type]
+      )
+    ) -> HCons(1,HNil)" in thread main:
+     */
+    HListSyntax[HCons[headT, tailT]](xs).remove[Boolean](
+      Remover.corecurseRebuild[Boolean, headT, tailT](
+        Remover.base[Boolean, HNil.type]
+      )
+    )
+    SDebug.traceExpression(xs.remove[Boolean])
   }
 
   {

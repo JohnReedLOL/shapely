@@ -19,11 +19,11 @@ final case class HCons[H, T <: HList](head: H, tail: T) extends HList {
     HCons(head, tail ++ xs)
   }
 }
-// This is called "HNil0" instead of "HNil" because there is already a type alias "HNil" in package.scala.
-case object HNil0 extends HList {
+
+case object HNil extends HList {
   override type Append[L <: HList] = L
 
-  override def ++[L <: HList](xs: L): HNil0.this.Append[L] = {
+  override def ++[L <: HList](xs: L): HNil.this.Append[L] = {
     xs
   }
 }

@@ -17,14 +17,14 @@ object Main {
 
   def main(args: Array[String]) {
 
-    val one: Successor[Zero0.type] = shapely.Successor(shapely.Zero)
+    val one: Successor[Zero.type] = shapely.Successor(shapely.Zero)
 
-    val two: Int = Nat.toInt[Successor[Successor[ZeroT]]]
+    val two: Int = Nat.toInt[Successor[Successor[Zero.type]]]
     SDebug.traceCode(two) // 2
 
     val fromInt: Nat = Nat.fromInt(2)
-    val fromIntCasted: Successor[Successor[shapely.ZeroT]] =
-      fromInt.asInstanceOf[Successor[Successor[ZeroT]]]
+    val fromIntCasted: Successor[Successor[Zero.type]] =
+      fromInt.asInstanceOf[Successor[Successor[Zero.type]]]
 
     SDebug.traceExpression(fromInt) // Successor(Successor(shapely.Zero0$@7cbd213e))
     SDebug.traceExpression(fromIntCasted) // the cast works

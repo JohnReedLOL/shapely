@@ -1,18 +1,16 @@
 package object shapely {
 
-  type HNilT = HNil0.type
-  val HNil = HNil0
+  implicit class HListSyntax[L <: HList](val me: L) extends AnyVal {
 
-  type ZeroT = Zero0.type
-  val Zero = Zero0
+    def ::[H](head: H): HCons[H, L] = HCons(head, me)
 
-  implicit class HListSyntax[L <: HList](val self: L) extends AnyVal {
+    /**
+      * REMOVES ALL INSTANCES OF TYPE A FROM HLIST
+      * The entire implementation in in the Remover typeclass.
+      */
+    def remove[A](implicit R: Remover[A, L]): R.Out = R(me)
 
-    def ::[H](head: H): HCons[H, L] = HCons(head, self)
-
-    def remove[A](implicit R: Remover[A, L]): R.Out = R(self)
-
-    def map[P <: PolymorphicFunction](p: P)(implicit M: Mapper[L, P]): M.Out = M(self)
+    def map[P <: PolymorphicFunction](p: P)(implicit M: Mapper[L, P]): M.Out = M(me)
 
     /** When an Int is passed in here ex. "list.nth(0)", an implicit
       * conversion from Int to Nat occurs via "implicit def fromInt(int: Int): Nat".
@@ -25,13 +23,13 @@ package object shapely {
       * Replacing "n.N" with "n.type" causes "Error: could not find implicit value for parameter N"
       *
       * @param N "Nther" is an implicit typeclass proof that indexing is valid.
-      * "L" is the type of the HList (self) that is calling "nth".
+      * "L" is the type of the HList(me) that is calling "nth".
       *  This expands into a series of calls to "Nther.corecurse" and "Nther.base" (for base/zero)
       */
-    def nth(n: Nat)(implicit N: Nther[L, n.N]): N.Out = N(self)
+    def nth(n: Nat)(implicit N: Nther[L, n.N]): N.Out = N(me)
   }
 
-  implicit class NatSyntax[N <: Nat](val self: N) extends AnyVal {
+  implicit class NatSyntax[N <: Nat](val me: N) extends AnyVal {
 
     def toInt(implicit N: ToInt[N]): Int = N.value
   }
